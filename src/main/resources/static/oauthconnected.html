@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>File Upload Menu</title>
+
+
+    <style type="text/css">
+        .progress { display: none; }
+        .success {color:green}
+        .error {color:red}
+        body,td,th {
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 12px;
+        }
+
+        .btn {
+            color: dodgerblue;
+        }
+
+    </style></head>
+
+<script>
+
+    var lexOrigin = "https://peach-dev-ed.lightning.force.com";
+    $(document).ready(function(ev) {
+        getToken();
+
+    });
+
+    function doPost(data) {
+        var w = opener;
+        var lexOrigin = data.origin;
+        w.postMessage(JSON.stringify(data), lexOrigin);
+    }
+
+    function getToken() {
+        $.ajax({
+            url: '/api/sso/getSessionOAuthAccessToken',
+            type: 'POST',
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(data, status, xhr) {
+                // ...
+                if (data.success == false) {
+                    console.log(data);
+                }
+                else if (data.success == true) {
+                    doPost(data);
+                }
+                window.close();
+            },
+            error: function(xhr, status, error) {
+            }
+        });
+
+    }
+
+
+</script>
+
+
+</head>
+
+<body  style="padding: 20px">
+Processing...
+</body>
+</html>

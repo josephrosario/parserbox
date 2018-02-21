@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>Parserbox Upload Menu</title>
+
+
+    <style type="text/css">
+        .progress { display: none; }
+        .success {color:green}
+        .error {color:red}
+        body,td,th {
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 12px;
+        }
+
+        .btn {
+            color: dodgerblue;
+        }
+
+    </style></head>
+
+    <script>
+        var maxFileSize = 0; // default
+        var makeDocumentInactiveOnExit = true;
+        $(window).on('beforeunload', function () {
+            if (makeDocumentInactiveOnExit) {
+                $.ajax({
+                    url: "/api/filemapper/setFileInactive",
+                    type: "POST",
+                    success: function (response) {
+                    }
+                });
+            }
+        });
+
+        function setError(str) {
+            $("#msg").removeClass("success");
+            $("#msg").addClass("error");
+            $("#msg").html(str);
+        }
+        function setMessage(str) {
+            $("#msg").removeClass("error");
+            $("#msg").addClass("success");
+            $("#msg").html(str);
+        }
+
+        $(document).ready(function(ev) {
+            doKeepFileAlive();
+            window.setInterval(function() {
+                doKeepFileAlive();
+            }, 3000);
+
+
+            $.ajax({
+                url: '/api/getMaxFileSize',
+                type: 'POST',
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(data, status, xhr) {
+                    // ...
+                    if (data.success == false) {
+                        setError(data.error);
+                    }
+                    else if (data.success == true) {
+                        maxFileSize = Number(data.maxFileSize);
+                    }
+                },
+                error: function(xhr, status, error) {
+               }
+            });
+
+
+
+            $("#uploadingForm").on('submit', (function(ev) {
+                ev.preventDefault();
+                $.ajax({
+                    xhr: function() {
+                        var progress = $('.progress'),
+                                        xhr = $.ajaxSettings.xhr();
+                        progress.show();
+                        xhr.upload.onprogress = function(ev) {
+                            if (ev.lengthComputable) {
+                                var percentComplete = parseInt((ev.loaded / ev.total) * 100);
+                                progress.val(percentComplete);
+                                if (percentComplete === 100) {
+                                    progress.hide().val(0);
+                                }
+                            }
+                        };
+                        return xhr;
+                    },
+                    url: '/api/uploadingPost',
+                    type: 'POST',
+                    data: new FormData(this),
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function(data, status, xhr) {
+                        // ...
+                        if (data.success == false) {
+                            setError(data.error);
+                        }
+                        else if (data.success == true) {
+                            setMessage("Upload successful.");
+                            makeDocumentInactiveOnExit = false;
+                            $("#submitBtn").attr("disabled", true);
+                            window.setTimeout(function() {
+                                window.close();
+                            }, 1000);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // ...
+
+                    }
+                });
+            }));
+        });
+
+        function doKeepFileAlive() {
+            $.ajax({
+                url: "/api/filemapper/keepFileAlive",
+                type: "POST",
+                success: function (response) {
+                    if (response.error) {
+                        if (response.error == "Timeout") {
+                            window.close();
+                        }
+                        if (response.error == "Inactive") {
+                            window.close();
+                        }
+                        else {
+                            window.close();
+                        }
+                    }
+                }
+            });
+        }
+
+    </script>
+
+
+</head>
+
+<body onload="updateSize();" style="padding: 20px">
+<form id="uploadingForm" name="uploadingForm">
+
+        <table>
+            <tr>
+                <td>
+                    <img src="pboxlogo2.png" style="margin-right: 3px; align-items: center">
+                </td>
+                <td>
+                    <h2>File Upload</h2>
+                </td>
+                <td>
+                    <img id="progressImage" style="display:none" src="progress_small_circle.gif" style="margin-left: 1px;">
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+
+                </td>
+                <td>
+
+                    <p>
+                        <input id="fileInput" type="file" style="color:dodgerblue" name="uploadingFiles" onchange="updateSize();">
+                        <progress class="progress" value="0" max="100"></progress>
+                    <div>
+                    <div style="display: none">Selected file: <span id="fileNum">0</span></div>
+
+                            File size: <span id="fileSize">0</span>
+                    </div>
+                    <p>
+                        <!--
+                        <input disabled id="submitBtn" type="button" value="Upload..." style="width:100px; margin-right: 2px" onclick="doSubmit();">
+                        -->
+                        <input disabled id="submitBtn" type="submit" value="Upload..." style="width:100px; margin-right: 2px">
+                        <input type="button" value="Cancel" style="width:100px" onclick="window.close();">
+
+                    </p>
+
+
+                </td>
+                <td>
+                    <span id="msg" ></span>
+                </td>
+            </tr>
+
+
+    </table>
+
+
+</form>
+<div>
+
+</div>
+<script>
+    var firstTime = true;
+    function updateSize() {
+        $("#msg").html("");
+        if (firstTime) {
+            firstTime = false;
+            doUpdateSize();
+        } else {
+            $("#progressImage").css("display","inline");
+            window.setTimeout(function() {
+                doUpdateSize();
+            }, 1000)
+        }
+    }
+
+    function doUpdateSize() {
+        var nBytes = 0,
+            oFiles = document.getElementById("fileInput").files,
+            nFiles = oFiles.length;
+        for (var nFileId = 0; nFileId < nFiles; nFileId++) {
+            nBytes += oFiles[nFileId].size;
+        }
+        var sOutput = nBytes + " bytes";
+        // optional code for multiples approximation
+        for (var aMultiples = ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], nMultiple = 0, nApprox = nBytes / 1024; nApprox > 1; nApprox /= 1024, nMultiple++) {
+            sOutput = nApprox.toFixed(3) + " " + aMultiples[nMultiple] + " (" + nBytes + " bytes)";
+        }
+        // end of optional code
+
+        document.getElementById("fileNum").innerHTML = nFiles;
+        document.getElementById("fileSize").innerHTML = sOutput;
+
+        if (nFiles > 0) {
+            var fileSizeExceeded = false;
+            var mB = nBytes / 1000000;
+            if (mB > maxFileSize) {
+                fileSizeExceeded = true;
+            }
+
+            if (fileSizeExceeded) {
+                setError("The maximum file size allowed is " + maxFileSize + " megabytes.");
+            } else {
+                $("#submitBtn").addClass("btn");
+                $("#submitBtn").attr("disabled", false);
+            }
+
+        }
+        $("#progressImage").css("display","none");
+
+
+    }
+</script>
+</body>
+</html>

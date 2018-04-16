@@ -295,12 +295,12 @@ public class BaseStripper  {
         processNonFormulaColumns();
 
         for (RowValue rowValue : rows) {
-            /*
+
             if (isFilterTokenFound(rowValue)) {
                 rowValue.setSkipRow(true);
                 continue;
             }
-            */
+
             // Sanitize data based on filter data types.
             rowValue = sanitizeData(rowValue);
 

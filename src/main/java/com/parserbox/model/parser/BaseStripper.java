@@ -293,7 +293,6 @@ public class BaseStripper  {
     protected void processColumns() throws IOException {
 
         processNonFormulaColumns();
-        if (true) return;
         for (RowValue rowValue : rows) {
 
             if (isFilterTokenFound(rowValue)) {

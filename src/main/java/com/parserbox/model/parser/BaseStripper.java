@@ -293,7 +293,7 @@ public class BaseStripper  {
     protected void processColumns() throws IOException {
 
         processNonFormulaColumns();
-
+        if (true) return;
         for (RowValue rowValue : rows) {
 
             if (isFilterTokenFound(rowValue)) {
@@ -452,7 +452,7 @@ public class BaseStripper  {
                 rowCnt++;
 
                 String line = rowValue.getLine().toString();
-                //log.info(line);
+                log.info(line);
                 ColumnValue columnValue = rowValue.getColumnValue(p.getId());
 
                 if (p.isGrabber()) {
@@ -620,6 +620,7 @@ public class BaseStripper  {
                         str2 = StringUtils.trimToEmpty(str2);
                         valueString = StringUtils.substringBetween(textToSearch, str1, str2);
                     }
+
                     else
                     if (grabberType.startsWith("containing")) {
                         String textHold = textToSearch;
@@ -1253,48 +1254,51 @@ public class BaseStripper  {
 
         JSONArray list = new JSONArray();
         List<RowValue> rowsList = rowsForPage.get(page);
-        for (RowValue rowValue : rowsList) {
-            if (rowValue.isSkipRow()) continue;
-            Map<String, ColumnValue> columnValues = rowValue.getColumnValues();
-            JSONArray object = new JSONArray();
-            for (ParsingFilter p : this.parsingFiltersWithMarkersAndGrabbers) {
-                String dataType = StringUtils.trimToEmpty(p.getDataType__c());
-                String value = "";
-                ColumnValue columnValue = columnValues.get(p.getId());
-                if (columnValue != null) {
-                    value = columnValue.getText();
-                }
-                if (StringUtils.isNotBlank(p.getFormattingPatternOutput__c())) {
-                    String outputPattern = StringUtils.trimToEmpty(p.getFormattingPatternOutput__c());
+        if ( rowsList != null) {
+            for (RowValue rowValue : rowsList) {
+                if (rowValue.isSkipRow()) continue;
+                Map<String, ColumnValue> columnValues = rowValue.getColumnValues();
+                JSONArray object = new JSONArray();
+                for (ParsingFilter p : this.parsingFiltersWithMarkersAndGrabbers) {
+                    String dataType = StringUtils.trimToEmpty(p.getDataType__c());
+                    String value = "";
+                    ColumnValue columnValue = columnValues.get(p.getId());
+                    if (columnValue != null) {
+                        value = columnValue.getText();
+                    }
+                    if (StringUtils.isNotBlank(p.getFormattingPatternOutput__c())) {
+                        String outputPattern = StringUtils.trimToEmpty(p.getFormattingPatternOutput__c());
 
-                    if (StringUtils.isNotBlank(value)) {
-                        try {
-                            if (dataType.equals("date")) {
-                                Date date = null;
-                                if (StringUtils.isNotBlank(p.getFormattingPatternInput__c())) {
-                                    String inputPattern = StringUtils.trimToEmpty(p.getFormattingPatternInput__c());
-                                    FastDateFormat f = FastDateFormat.getInstance(inputPattern);
-                                    date = f.parse(value);
-                                }
-                                else {
-                                    if (DateValidator.getInstance().isValid(value)) {
-                                        date = DateHelper.getDate(value);
+                        if (StringUtils.isNotBlank(value)) {
+                            try {
+                                if (dataType.equals("date")) {
+                                    Date date = null;
+                                    if (StringUtils.isNotBlank(p.getFormattingPatternInput__c())) {
+                                        String inputPattern = StringUtils.trimToEmpty(p.getFormattingPatternInput__c());
+                                        FastDateFormat f = FastDateFormat.getInstance(inputPattern);
+                                        date = f.parse(value);
+                                    }
+                                    else {
+                                        if (DateValidator.getInstance().isValid(value)) {
+                                            date = DateHelper.getDate(value);
+                                        }
+                                    }
+                                    if (date != null) {
+                                        value = DateFormatUtils.format(date, outputPattern);
                                     }
                                 }
-                                if (date != null) {
-                                    value = DateFormatUtils.format(date, outputPattern);
-                                }
+                            } catch (Exception e) {
+                                value = e.getMessage()  ;
                             }
-                        } catch (Exception e) {
-                            value = e.getMessage()  ;
                         }
                     }
-                }
 
-                object.add(value);
+                    object.add(value);
+                }
+                list.add(object);
             }
-            list.add(object);
         }
+
         if (! includeHeader ) {
             return list.toJSONString();
         }

@@ -871,6 +871,10 @@ public class FileMapperController {
                     }
                 }
 
+                if (firstPage <= 0) {
+                    firstPage = 1;
+                }
+
                 if (StringUtils.isNotBlank(exportType)) {
                     stripper.setStartPage(startPage);
                     stripper.setEndPage(endPage);

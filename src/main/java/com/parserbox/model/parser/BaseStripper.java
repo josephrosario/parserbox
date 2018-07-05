@@ -451,7 +451,6 @@ public class BaseStripper  {
                 rowCnt++;
 
                 String line = rowValue.getLine().toString();
-                log.info(line);
                 ColumnValue columnValue = rowValue.getColumnValue(p.getId());
 
                 if (p.isGrabber()) {

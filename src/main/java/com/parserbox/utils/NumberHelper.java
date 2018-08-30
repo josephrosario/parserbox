@@ -115,6 +115,12 @@ public class NumberHelper  {
             v = StringUtils.removeStart(v, "'");
             v = StringUtils.removeEnd(v, "'");
             v = StringUtils.remove(v, ",");
+            if (v.endsWith(".0")) {
+                v = StringUtils.removeEnd(v, ".0");
+            }
+            if (v.endsWith(".00")) {
+                v = StringUtils.removeEnd(v, ".00");
+            }
         }
 
         return v;
@@ -259,7 +265,21 @@ public class NumberHelper  {
         return isZeroStrict(base.subtract(other));
     }
 
+    public static boolean isInteger(String s) {
+        boolean isValidInteger = false;
+        try {
+            Integer.parseInt(s);
 
+            isValidInteger = true;
+        }
+        catch (NumberFormatException ex) {
+        }
+        return isValidInteger;
+    }
+
+    public static boolean isNumeric(String s) {
+        return s.matches("-?\\d+(\\.\\d+)?");
+    }
 
     public static String getPercentage(Number num) {
         double value = 0;

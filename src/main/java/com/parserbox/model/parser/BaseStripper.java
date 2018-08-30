@@ -841,7 +841,16 @@ public class BaseStripper  {
                         }
                     } else {
                         if (DateValidator.getInstance().isValid(text) == false) {
-                            text = "";
+                            if (NumberHelper.isNumeric(text)) {
+                                try {
+                                    Date dt = DateHelper.getDateFromExcelSerialNumber(text);
+                                    if (dt != null) {
+                                        text = DateHelper.getSimpleDateStr(dt);
+                                    }
+                                } catch (Exception dEx) {}
+                            } else {
+                                text = "";
+                            }
                         }
                     }
                 }

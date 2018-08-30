@@ -5,7 +5,9 @@ import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 
 public class DateHelper {
@@ -103,6 +105,19 @@ public class DateHelper {
         }
 
         throw new ParseException("Unsupported date format:" + dateStr, 0);
+    }
+
+    public static Date getDateFromExcelSerialNumber(String str) throws Exception {
+        String s = NumberHelper.clean(str, null);
+        return getDateFromExcelSerialNumber(Integer.parseInt(s));
+    }
+
+    public static Date getDateFromExcelSerialNumber(Integer number) throws Exception {
+        Date base = getDate("01/01/1900");
+        Calendar c = Calendar.getInstance();
+        c.setTime(base);
+        c.add(Calendar.DATE, number);
+        return c.getTime();
     }
 
 }

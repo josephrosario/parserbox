@@ -463,8 +463,8 @@ public class BaseStripper  {
                     String grabberType = p.getGrabberType__c().toLowerCase();
                     String grabber1 = p.getGrabber1__c();
                     String grabber2 = p.getGrabber2__c();
-
-                    if ( ! p.isSearchType1MaskorRegex()) {
+                    /*
+                    if ( ! p.isSearchType1MaskorRegex()) {se
                         textToSearch = StringUtils.removeAll(textToSearch, " ");
                         if (grabber1 != null) {
                             grabber1 = StringUtils.removeAll(grabber1, " ");
@@ -474,6 +474,16 @@ public class BaseStripper  {
                         }
                     }
 
+                     */
+                    if ( ! p.isSearchType1MaskorRegex()) {
+                        textToSearch = StringUtils.trim(textToSearch);
+                        if (grabber1 != null) {
+                            grabber1 = StringUtils.trim(grabber1);
+                        }
+                        if (grabber2 != null) {
+                            grabber2 = StringUtils.trim(grabber2);
+                        }
+                    }
                     if (grabberType.startsWith("any non-space at first position")) {
                         TextPositionWrapper t = columnValue.getTextPosition(0);
                         if (t != null) {

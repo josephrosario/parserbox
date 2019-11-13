@@ -14,13 +14,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-//import net.sourceforge.vietocr.PdfUtilities;
-import net.sourceforge.tess4j.util.PdfUtilities;
+
 public class Test {
-    public String TEST_DIR = "/home/jrosario/test";
+  //  public String TEST_DIR = "c:/home/jrosario/test";
+    public String TEST_DIR = "c:/test";
+
     public static void main(String[] args) {
         new Test().runTest();
     }
+
 
     public void runTest() {
         try {
@@ -37,7 +39,8 @@ public class Test {
             document.close();
 
             Tesseract tesseract = new Tesseract();
-            tesseract.setDatapath("/usr/share/tesseract-ocr/4.00/tessdata");
+           // tesseract.setDatapath("/usr/share/tesseract-ocr/4.00/tessdata");
+            tesseract.setDatapath("C:/hold/Tess4J-3.4.8-src/Tess4J/tessdata");
 
             ITessAPI.TessResultRenderer renderer = new ITessAPI.TessResultRenderer();
             List<ITesseract.RenderedFormat> list = new ArrayList<>();

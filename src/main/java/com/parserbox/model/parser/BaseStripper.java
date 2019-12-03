@@ -1271,51 +1271,48 @@ public class BaseStripper  {
 
         JSONArray list = new JSONArray();
         List<RowValue> rowsList = rowsForPage.get(page);
-        if ( rowsList != null) {
-            for (RowValue rowValue : rowsList) {
-                if (rowValue.isSkipRow()) continue;
-                Map<String, ColumnValue> columnValues = rowValue.getColumnValues();
-                JSONArray object = new JSONArray();
-                for (ParsingFilter p : this.parsingFiltersWithMarkersAndGrabbers) {
-                    String dataType = StringUtils.trimToEmpty(p.getDataType__c());
-                    String value = "";
-                    ColumnValue columnValue = columnValues.get(p.getId());
-                    if (columnValue != null) {
-                        value = columnValue.getText();
-                    }
-                    if (StringUtils.isNotBlank(p.getFormattingPatternOutput__c())) {
-                        String outputPattern = StringUtils.trimToEmpty(p.getFormattingPatternOutput__c());
+        for (RowValue rowValue : rowsList) {
+            if (rowValue.isSkipRow()) continue;
+            Map<String, ColumnValue> columnValues = rowValue.getColumnValues();
+            JSONArray object = new JSONArray();
+            for (ParsingFilter p : this.parsingFiltersWithMarkersAndGrabbers) {
+                String dataType = StringUtils.trimToEmpty(p.getDataType__c());
+                String value = "";
+                ColumnValue columnValue = columnValues.get(p.getId());
+                if (columnValue != null) {
+                    value = columnValue.getText();
+                }
+                if (StringUtils.isNotBlank(p.getFormattingPatternOutput__c())) {
+                    String outputPattern = StringUtils.trimToEmpty(p.getFormattingPatternOutput__c());
 
-                        if (StringUtils.isNotBlank(value)) {
-                            try {
-                                if (dataType.equals("date")) {
-                                    Date date = null;
-                                    if (StringUtils.isNotBlank(p.getFormattingPatternInput__c())) {
-                                        String inputPattern = StringUtils.trimToEmpty(p.getFormattingPatternInput__c());
-                                        FastDateFormat f = FastDateFormat.getInstance(inputPattern);
-                                        date = f.parse(value);
-                                    }
-                                    else {
-                                        if (DateValidator.getInstance().isValid(value)) {
-                                            date = DateHelper.getDate(value);
-                                        }
-                                    }
-                                    if (date != null) {
-                                        value = DateFormatUtils.format(date, outputPattern);
+                    if (StringUtils.isNotBlank(value)) {
+                        try {
+                            if (dataType.equals("date")) {
+                                Date date = null;
+                                if (StringUtils.isNotBlank(p.getFormattingPatternInput__c())) {
+                                    String inputPattern = StringUtils.trimToEmpty(p.getFormattingPatternInput__c());
+                                    FastDateFormat f = FastDateFormat.getInstance(inputPattern);
+                                    date = f.parse(value);
+                                }
+                                else {
+                                    if (DateValidator.getInstance().isValid(value)) {
+                                        date = DateHelper.getDate(value);
                                     }
                                 }
-                            } catch (Exception e) {
-                                value = e.getMessage()  ;
+                                if (date != null) {
+                                    value = DateFormatUtils.format(date, outputPattern);
+                                }
                             }
+                        } catch (Exception e) {
+                            value = e.getMessage()  ;
                         }
                     }
-
-                    object.add(value);
                 }
-                list.add(object);
-            }
-        }
 
+                object.add(value);
+            }
+            list.add(object);
+        }
         if (! includeHeader ) {
             return list.toJSONString();
         }

@@ -122,7 +122,7 @@ public class NumberHelper  {
                 v = StringUtils.removeEnd(v, ".00");
             }
         }
-
+        if (StringUtils.isBlank(v)) v = "0";
         return v;
     }
     public static int getInt(double dbl, boolean roundUp) {

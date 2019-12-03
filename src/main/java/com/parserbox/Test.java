@@ -18,10 +18,12 @@ import java.util.Random;
 public class Test {
   //  public String TEST_DIR = "c:/home/jrosario/test";
     public String TEST_DIR = "c:/test";
-
+    /*
     public static void main(String[] args) {
         new Test().runTest();
     }
+
+     */
 
 
     public void runTest() {

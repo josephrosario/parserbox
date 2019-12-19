@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.validator.routines.DateValidator;
 
+import org.apache.pdfbox.text.TextPosition;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -1112,6 +1113,23 @@ public class BaseStripper  {
                             .append(">")
                             .append("</div>");
                 } else {
+                    TextPosition pos = p.getTextPosition();
+                    String fontname = pos.getFont().getSubType();
+                    boolean isStandardFont = pos.getFont().isStandard14();
+                    boolean isTrueType = StringUtils.contains(fontname.toUpperCase(), "TRUETYPE");
+                    html
+                            .append("<div class='_d' style='")
+                            .append("top:").append(df.format(pos.getYDirAdj() * this.scalingMultiplier)).append("px;")
+                            .append("left:").append(df.format(pos.getXDirAdj() * this.scalingMultiplier)).append("px;");
+
+                            if (!isTrueType) {
+                                html.append("font-size:").append(df.format(pos.getFontSizeInPt() * this.scalingMultiplier)).append("px;");
+                            }
+                            //html.append("font-family:").append(pos.getFont().getName()).append(";");
+                            html.append("'>")
+                            .append(p.getUnicode())
+                            .append("</div>");
+                    /*
                     html
                             .append("<div class='_d' style='")
                             .append("top:").append(df.format(p.getYDirAdj() * this.scalingMultiplier)).append("px;")
@@ -1120,6 +1138,8 @@ public class BaseStripper  {
                             .append("'>")
                             .append(p.getUnicode())
                             .append("</div>");
+
+                     */
                 }
             }
         }

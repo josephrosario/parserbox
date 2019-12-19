@@ -114,6 +114,7 @@ public class PDFStripperImpl extends PDFTextStripper implements ITextStripper {
             for (TextPosition p : textPositions) {
                 TextPositionWrapper w = new TextPositionWrapper(
                         p.getXDirAdj(), p.getYDirAdj(), p.getUnicode(), p.getFontSizeInPt());
+                w.setTextPosition(p);
                 list.add(w);
             }
         }

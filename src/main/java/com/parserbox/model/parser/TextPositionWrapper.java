@@ -1,5 +1,7 @@
 package com.parserbox.model.parser;
 
+import org.apache.pdfbox.text.TextPosition;
+
 public class TextPositionWrapper {
 
     float XDirAdj;
@@ -9,6 +11,7 @@ public class TextPositionWrapper {
 
     boolean textBoxMode = false;
     float widthInPixels;
+    TextPosition textPosition;
 
     public TextPositionWrapper(float X, float Y,
                                String unicode,
@@ -78,5 +81,13 @@ public class TextPositionWrapper {
 
     public void setWidthInPixels(float widthInPixels) {
         this.widthInPixels = widthInPixels;
+    }
+
+    public TextPosition getTextPosition() {
+        return textPosition;
+    }
+
+    public void setTextPosition(TextPosition textPosition) {
+        this.textPosition = textPosition;
     }
 }
